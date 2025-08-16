@@ -8,7 +8,18 @@ resource "aws_vpc" "my_vpc" {
 }
 
 // public subnets
-resource "aws_subnet" "my_subnet" {
+resource "aws_subnet" "public_subnets" {
+  count = 2
+  vpc_id     = aws_vpc.my_vpc.id
+  cidr_block = element(var.public_subnet_cidr_block, count.index)
+  availability_zone = element(var.availability_zones, count.index)
+
+  tags = {
+    Name = "${var.environment}-nginx-public_subnet"
+  }
+}
+
+resource "aws_subnet" "private_subnets" {
   count = 2
   vpc_id     = aws_vpc.my_vpc.id
   cidr_block = element(var.public_subnet_cidr_block, count.index)

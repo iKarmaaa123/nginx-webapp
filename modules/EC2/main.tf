@@ -13,29 +13,31 @@ resource "aws_instance" "webapp" {
   }
 }
 
-// retrieving ami id from aws for ec2 instance
 data "aws_ami" "amzlinux2" {
   most_recent = true
+  owners = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*"]
+    values = ["Amazon Linux 2023 kernel-6.1 AMI"]
+  }
+
+  filter {
+    name = "root-device-type"
+    values = ["ebs"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-
-  owners = ["137112412989"] # Amazon
 }
 
-// allocating public ip address to ec2 instances
 resource "aws_eip" "lb" {
   count = var.eip_count
   depends_on = [aws_instance.webapp]
   instance = aws_instance.webapp[count.index].id
-  domain   = "vpc"
+  domain   = var.domain
 }
 
 

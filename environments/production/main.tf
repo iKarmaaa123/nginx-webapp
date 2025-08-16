@@ -21,7 +21,6 @@ module "ec2module" {
   security_group_ids = [module.vpcmodule.security_group_ids]
 }
 
-// application load balancer
 resource "aws_lb" "my_lb" {
   name               = "${var.environment}-nginx-loadbalancer"
   internal           = false
@@ -30,14 +29,12 @@ resource "aws_lb" "my_lb" {
   security_groups    = [module.vpcmodule.security_group_ids]
 }
 
-// alb target group
 resource "aws_lb_target_group" "my_lb_target_group" {
   name     = "${var.environment}-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = module.vpcmodule.vpc_id
 
-// health check settings
   health_check {
     enabled = true
     port = "traffic-port"

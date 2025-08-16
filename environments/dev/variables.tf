@@ -75,4 +75,8 @@ variable "eip_count" {
     type = number
     default = 0
 }
-//gkndgdvccx
+
+variable "domain" {
+  type = string
+  default = ""
+}

@@ -14,3 +14,4 @@ user_data = <<-EOF
   sudo systemctl start nginx
   sudo systemctl enable nginx
   EOF
+domain = "vpc"
