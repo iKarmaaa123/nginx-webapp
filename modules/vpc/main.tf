@@ -22,7 +22,7 @@ resource "aws_subnet" "public_subnets" {
 resource "aws_subnet" "private_subnets" {
   count = 2
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = element(var.public_subnet_cidr_block, count.index)
+  cidr_block = element(var.private_subnet_cidr_block, count.index)
   availability_zone = element(var.availability_zones, count.index)
 
   tags = {
@@ -72,7 +72,7 @@ resource "aws_security_group_rule" "egress_port_0" {
 }
 
 // internet gateway to allow subnets within vpc to send requests to the internet or to accept requests from the internet
-resource "aws_internet_gateway" "gw" {
+resource "aws_internet_gateway" "my_internet_gateway" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
@@ -80,14 +80,30 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
+resource "aws_nat_gateway" "my_aws_nat_gateway" {
+  count = 2
+  allocation_id = aws_eip.my_aws_eip[count.index].id
+  subnet_id     = aws_subnet.public_subnets[count.index].id
+
+  tags = {
+    Name = "${var.environment}-NATGateway"
+  }
+  depends_on = [aws_internet_gateway.my_internet_gateway]
+}
+
+resource "aws_eip" "my_aws_eip" {
+  count = 2
+  domain   = "vpc"
+}
+
 // route table for public subnet to send traffic to the internet
-resource "aws_route_table" "my_route_table" {
+resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.my_vpc.id
   count = 2
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
+    gateway_id = aws_internet_gateway.my_internet_gateway.id
   }
 
   tags = {
@@ -95,9 +111,29 @@ resource "aws_route_table" "my_route_table" {
   }
 }
 
-// route table association for public subnets
-resource "aws_route_table_association" "my_aws_route_table_association" {
+resource "aws_route_table" "private_route_table" {
   count = 2
-  subnet_id     = aws_subnet.my_subnet[count.index].id
-  route_table_id = aws_route_table.my_route_table[count.index].id
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.my_aws_nat_gateway[count.index].id
+  }
+
+  tags = {
+    Name = "private_route_table"
+  }
+}
+
+// route table association for public subnets
+resource "aws_route_table_association" "my_aws_public_route_table_association" {
+  count = 2
+  subnet_id     = aws_subnet.public_subnets[count.index].id
+  route_table_id = aws_route_table.public_route_table[count.index].id
+}
+
+resource "aws_route_table_association" "my_aws_private_route_table_association" {
+  count = 2
+  subnet_id     = aws_subnet.private_subnets[count.index].id
+  route_table_id = aws_route_table.private_route_table[count.index].id
 }

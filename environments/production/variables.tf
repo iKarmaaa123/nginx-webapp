@@ -34,6 +34,12 @@ variable "public_subnet_cidr_block" {
     default = []
 }
 
+// vpc cidr block
+variable "private_subnet_cidr_block" {
+    type = list
+    default = []
+}
+
 // availability zones
 variable "availability_zones" {
     type = list

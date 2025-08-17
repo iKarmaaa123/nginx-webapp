@@ -22,6 +22,12 @@ variable "public_subnet_cidr_block" {
     default = []
 }
 
+// cidr block values for public subnets
+variable "private_subnet_cidr_block" {
+    type = list
+    default = []
+}
+
 // availability zones 
 variable "availability_zones" {
     type = list

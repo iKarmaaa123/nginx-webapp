@@ -9,7 +9,7 @@ terraform {
 
 terraform {
   backend "s3" {
-    bucket = "devops-project-backend"
+    bucket = "nginx-backend-project"
     key    = "dev_statefile/terraform.tfstate"
     region = "us-east-1"
   }

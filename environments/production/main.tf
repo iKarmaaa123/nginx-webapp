@@ -1,7 +1,8 @@
 module "vpcmodule" {
-  source = "../../modules/vpc"
+  source = "../../modules/VPC"
   vpc_cidr_block = var.vpc_cidr_block
   public_subnet_cidr_block = var.public_subnet_cidr_block
+  private_subnet_cidr_block = var.private_subnet_cidr_block
   vpc_name = var.vpc_name
   subnet_name = var.subnet_name
   environment = var.environment
@@ -9,14 +10,13 @@ module "vpcmodule" {
 }
 
 module "ec2module" {
-  source = "../../modules/webapp"
+  source = "../../modules/EC2"
   instance_type = var.instance_type
   ec2_count = var.ec2_count
   eip_count = var.eip_count
-  key_name = var.key_name
   environment = var.environment
   user_data = var.user_data
-  subnet_ids = module.vpcmodule.subnet_ids
+  subnet_ids = module.vpcmodule.private_subnet_ids
   vpc_id = module.vpcmodule.vpc_id
   security_group_ids = [module.vpcmodule.security_group_ids]
 }
@@ -25,7 +25,7 @@ resource "aws_lb" "my_lb" {
   name               = "${var.environment}-nginx-loadbalancer"
   internal           = false
   load_balancer_type = "application"
-  subnets            = module.vpcmodule.subnet_ids
+  subnets            = module.vpcmodule.public_subnet_ids
   security_groups    = [module.vpcmodule.security_group_ids]
 }
 

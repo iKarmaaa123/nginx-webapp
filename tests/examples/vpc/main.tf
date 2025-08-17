@@ -1,24 +1,36 @@
-// creating vpc
+// creating VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block = var.vpc_cidr_block
 
   tags = {
-    name = "${var.environment}-nginx_vpc"
+    Name = "${var.environment}-nginx_vpc"
   }
 }
 
-// creating vpc
-resource "aws_subnet" "my_subnet" {
+// public subnets
+resource "aws_subnet" "public_subnets" {
+  count = 2
   vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = var.public_subnet_cidr_block
-  availability_zone = var.availability_zone
+  cidr_block = element(var.public_subnet_cidr_block, count.index)
+  availability_zone = element(var.availability_zones, count.index)
 
   tags = {
     Name = "${var.environment}-nginx-public_subnet"
   }
 }
 
-// creating security group
+resource "aws_subnet" "private_subnets" {
+  count = 2
+  vpc_id     = aws_vpc.my_vpc.id
+  cidr_block = element(var.private_subnet_cidr_block, count.index)
+  availability_zone = element(var.availability_zones, count.index)
+
+  tags = {
+    Name = "${var.environment}-nginx-private_subnet"
+  }
+}
+
+// security group
 resource "aws_security_group" "my_security_group" {
   name        = "dev_security_group"
   description = "Allow SSH and HTTP traffic"
@@ -29,17 +41,17 @@ resource "aws_security_group" "my_security_group" {
   }
 }
 
-// accepting port 80 requests from anywhere
-resource "aws_security_group_rule" "port_80_requests" {
+// security group rule to Accept port 80 requests that will come from the ALB
+resource "aws_security_group_rule" "ingress_port_80" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.my_security_group.id
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
-// accepting SSH requests from anywhere
+// security group rule to allow the instance to accept SSH requests from anywhere
 resource "aws_security_group_rule" "ingress_port_22" {
   type              = "ingress"
   from_port         = 22
@@ -59,8 +71,8 @@ resource "aws_security_group_rule" "egress_port_0" {
   security_group_id = aws_security_group.my_security_group.id
 }
 
-// internet gateway
-resource "aws_internet_gateway" "gw" {
+// internet gateway to allow subnets within vpc to send requests to the internet or to accept requests from the internet
+resource "aws_internet_gateway" "my_internet_gateway" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
@@ -68,23 +80,60 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
+resource "aws_nat_gateway" "my_aws_nat_gateway" {
+  count = 2
+  allocation_id = aws_eip.my_aws_eip[count.index].id
+  subnet_id     = aws_subnet.public_subnets[count.index].id
+
+  tags = {
+    Name = "${var.environment}-NATGateway"
+  }
+  depends_on = [aws_internet_gateway.my_internet_gateway]
+}
+
+resource "aws_eip" "my_aws_eip" {
+  count = 2
+  domain   = "vpc"
+}
+
 // route table for public subnet to send traffic to the internet
-resource "aws_route_table" "my_route_table" {
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.my_vpc.id
+  count = 2
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_internet_gateway.id
+  }
+
+  tags = {
+    Name = "${var.environment}-nginx-route_table"
+  }
+}
+
+resource "aws_route_table" "private_route_table" {
+  count = 2
   vpc_id = aws_vpc.my_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
+    gateway_id = aws_nat_gateway.my_aws_nat_gateway[count.index].id
   }
 
   tags = {
-    Name = "${var.environment}-route_table-1"
+    Name = "private_route_table"
   }
 }
 
-// association for public subnet
-resource "aws_route_table_association" "my_aws_route_table_association" {
-  subnet_id     = aws_subnet.my_subnet.id
-  route_table_id = aws_route_table.my_route_table.id
+// route table association for public subnets
+resource "aws_route_table_association" "my_aws_public_route_table_association" {
+  count = 2
+  subnet_id     = aws_subnet.public_subnets[count.index].id
+  route_table_id = aws_route_table.public_route_table[count.index].id
 }
 
+resource "aws_route_table_association" "my_aws_private_route_table_association" {
+  count = 2
+  subnet_id     = aws_subnet.private_subnets[count.index].id
+  route_table_id = aws_route_table.private_route_table[count.index].id
+}

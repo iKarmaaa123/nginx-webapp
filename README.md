@@ -60,7 +60,7 @@ tests/
         └── variables.tf
 ```
 
-The project is organized into three main directories:
+The project is organised into three main directories:
 - environments: Contains configurations for development, staging, and production environments
 - modules: Houses reusable Terraform modules for EC2 and VPC infrastructure
 - tests: Contains Terratest files for infrastructure testing using Golang
@@ -88,6 +88,16 @@ terraform plan
 ```hcl
 terraform apply
 ```
+
+</h2> Accessing web application </h2>
+
+- You should be able to access the instance in either availability zone through the Application Load Balancer's DNS name:
+
+- Once you do, you will be presented with the following web page:
+
+
+Well done! You have successfully the infrastructure, and have a working web server.
+
 
 <h2> Step 2: Testing the Infrastructure </h2>
 

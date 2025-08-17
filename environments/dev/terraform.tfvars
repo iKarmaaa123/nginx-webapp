@@ -7,7 +7,6 @@ instance_type = "t2.micro"
 ec2_count = 2
 eip_count = 2
 environment = "Dev"
-key_name = "project-key"
 user_data = <<-EOF
   #!/bin/bash
   sudo amazon-linux-extras install -y nginx1.12
