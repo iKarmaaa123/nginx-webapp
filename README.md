@@ -93,8 +93,11 @@ terraform apply
 
 - You should be able to access the instance in either availability zone through the Application Load Balancer's DNS name:
 
+![alt text](image-1.png)
+
 - Once you do, you will be presented with the following web page:
 
+![alt text](image.png)
 
 Well done! You have successfully the infrastructure, and have a working web server.
 
