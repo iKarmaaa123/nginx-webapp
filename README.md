@@ -89,7 +89,7 @@ terraform plan
 terraform apply
 ```
 
-<h2> Accessing web application </h2>
+<h2> Step 2: Accessing web application </h2>
 
 You should be able to access the instance in either availability zone through the Application Load Balancer's DNS name:
 
@@ -101,7 +101,7 @@ Once you do, you will be presented with the following web page:
 
 Well done! You have successfully the infrastructure, and have a working web server.
 
-<h2> Step 2: Testing the Infrastructure </h2>
+<h2> Step 3: Testing the Infrastructure </h2>
 
 The project includes comprehensive Terratest files to validate the infrastructure:
 
@@ -119,7 +119,7 @@ The tests verify:
   - EC2 instance public IP validity
   - HTTP accessibility on port 80
 
-<h2> Step 3: Environment Management </h2>
+<h2> Step 4: Environment Management </h2>
 
 This project supports three environments:
 - Development (dev): For development and testing (no ALB)
@@ -132,7 +132,7 @@ Each environment contains:
 - variables.tf: Default variable definitions
 - versions.tf: Terraform and AWS version specifications
 
-<h2> Step 4: CI/CD Pipeline </h2>
+<h2> Step 5: CI/CD Pipeline </h2>
 
 The project includes a CI/CD pipeline that automates:
 1. Infrastructure Planning
@@ -142,7 +142,7 @@ The project includes a CI/CD pipeline that automates:
 
 The pipeline uses an S3 remote backend to maintain state consistency across stages.
 
-<h2> Step 5: Cleaning Up </h2>
+<h2> Step 6: Cleaning Up </h2>
 
 To avoid unnecessary AWS charges, destroy the infrastructure when no longer needed:
 
