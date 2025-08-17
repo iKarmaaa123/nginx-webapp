@@ -89,18 +89,17 @@ terraform plan
 terraform apply
 ```
 
-</h2> Accessing web application </h2>
+<h2> Accessing web application </h2>
 
-- You should be able to access the instance in either availability zone through the Application Load Balancer's DNS name:
+You should be able to access the instance in either availability zone through the Application Load Balancer's DNS name:
 
 ![image](images/image-1.png)
 
-- Once you do, you will be presented with the following web page:
+Once you do, you will be presented with the following web page:
 
 ![image](images/image.png)
 
 Well done! You have successfully the infrastructure, and have a working web server.
-
 
 <h2> Step 2: Testing the Infrastructure </h2>
 
