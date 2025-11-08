@@ -17,7 +17,7 @@ func TestTerraformInstance(t *testing.T) {
 	// retryable errors in terraform testing.
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// The path to where our Terraform code is located
-		TerraformDir: "./examples/webapp",
+		TerraformDir: "./examples/EC2",
 	})
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created.

@@ -58,22 +58,11 @@ variable "ec2_count" {
     default = 0
 }
 
-// key name for instance
-variable "key_name" {
-    type = string
-    default = ""
-}
 
 // user_data for scripts to install onto ec2 instance
 variable "user_data" {
     type = string
     default = ""
-}
-
-// number of elastic ip addresses
-variable "eip_count" {
-    type = number
-    default = 0
 }
 
 variable "domain" {

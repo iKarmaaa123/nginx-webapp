@@ -22,6 +22,6 @@ func TestVpcCidrBlockValue(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Run `terraform output` to get the values of output variables and check they have the expected values.
-	output := terraform.Output(t, terraformOptions, "vpc_cidr_block")
-	assert.Equal(t, "10.0.0.0/16", output)
+	vpc_cidr_block_output := terraform.Output(t, terraformOptions, "vpc_cidr_block")
+	assert.Equal(t, "10.0.0.0/16", vpc_cidr_block_output)
 }

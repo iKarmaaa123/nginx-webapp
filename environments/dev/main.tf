@@ -12,7 +12,6 @@ module "ec2module" {
   source = "../../modules/EC2"
   instance_type = var.instance_type
   ec2_count = var.ec2_count
-  eip_count = var.eip_count
   environment = var.environment
   user_data = var.user_data
   subnet_ids = module.vpcmodule.subnet_ids
